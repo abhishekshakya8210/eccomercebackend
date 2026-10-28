@@ -1,0 +1,223 @@
+{
+  "info": {
+    "_postman_id": "ecom-product-api-v1",
+    "name": "E-Commerce Product API (Production v1)",
+    "description": "Production-grade Product & Category APIs for Flutter Mobile App (Android/iOS)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Customer / Public APIs",
+      "item": [
+        {
+          "name": "Get Products (Search, Filter, Sort, Paginate)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?search=shirt&minPrice=100&maxPrice=2500&inStock=true&sort=price_asc&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                { "key": "search", "value": "shirt", "description": "Search text in name, description, brand" },
+                { "key": "category", "value": "{{categoryId}}", "disabled": true, "description": "Filter by Category ID" },
+                { "key": "brand", "value": "Nike", "disabled": true, "description": "Filter by Brand" },
+                { "key": "minPrice", "value": "100", "description": "Minimum price" },
+                { "key": "maxPrice", "value": "2500", "description": "Maximum price" },
+                { "key": "inStock", "value": "true", "description": "Filter only items in stock (>0)" },
+                { "key": "sort", "value": "price_asc", "description": "Options: price_asc, price_desc, newest, oldest" },
+                { "key": "page", "value": "1", "description": "Page number (default: 1)" },
+                { "key": "limit", "value": "10", "description": "Items per page (max: 100)" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Product By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["categories"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin APIs (Protected)",
+      "item": [
+        {
+          "name": "Create Category (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Clothing\",\n  \"description\": \"Fashion wear, shirts, trousers, and accessories\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Create Product with Images (Multipart Form-Data)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}", "type": "text" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Men Cotton Slim Fit Shirt", "type": "text" },
+                { "key": "description", "value": "Premium breathable 100% cotton casual shirt", "type": "text" },
+                { "key": "price", "value": "1299", "type": "text" },
+                { "key": "compareAtPrice", "value": "1999", "type": "text" },
+                { "key": "sku", "value": "SHIRT-COTTON-001", "type": "text" },
+                { "key": "stock", "value": "50", "type": "text" },
+                { "key": "brand", "value": "UrbanFab", "type": "text" },
+                { "key": "category", "value": "{{categoryId}}", "type": "text" },
+                { "key": "isActive", "value": "true", "type": "text" },
+                { "key": "images", "type": "file", "src": [], "description": "Select up to 5 images (JPEG, PNG, WebP)" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"]
+            }
+          }
+        },
+        {
+          "name": "Get Admin Products (All, including inactive)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "isActive", "value": "false", "disabled": true, "description": "Filter by active status" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Admin Product By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Product (JSON or Multipart)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 1199,\n  \"stock\": 45,\n  \"brand\": \"UrbanFab Studio\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Product Status (Activate / Deactivate)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{productId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{productId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{adminToken}}", "type": "text" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "products", "{{productId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
