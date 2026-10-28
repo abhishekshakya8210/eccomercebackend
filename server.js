@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import connectDB from "./config/db.js";
 import registerRouter from "./router/registerrouter.js";
 import productRouter from "./router/productrouter.js";
@@ -12,6 +13,23 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
+
+// CORS configuration (enables requests from Web browsers, Flutter web, etc.)
+app.use(
+    cors({
+        origin: true, // Dynamically reflects request origin to support all origins with credentials
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: [
+            "Origin",
+            "X-Requested-With",
+            "Content-Type",
+            "Accept",
+            "Authorization",
+            "token",
+        ],
+    })
+);
 
 // Middleware to parse cookies
 app.use(cookieParser());
@@ -39,9 +57,21 @@ app.use((req, res, next) => {
     next();
 });
 
+// Health check / root endpoint
+app.get("/", (req, res) => {
+    res.status(200).json({
+        status: true,
+        message: "Ecommerce Backend API is running smoothly",
+    });
+});
+
 // Routes
 app.use("/api", registerRouter);
+// Fallback alias in case client URL contains typo '/apl' instead of '/api'
+app.use("/apl", registerRouter);
+
 app.use("/api/v1", productRouter);
+app.use("/apl/v1", productRouter);
 
 
 app.listen(PORT, () => {
